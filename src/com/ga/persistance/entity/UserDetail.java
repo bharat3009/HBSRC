@@ -6,6 +6,8 @@ import java.util.Collection;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -35,21 +37,22 @@ public class UserDetail implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "user_id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Expose
-    private String userId;
+    private Integer userId;
     @Column(name = "user_name")
     @Expose
     private String userName;
     @Column(name = "password")
     private String password;
     @Column(name = "area_id")
-    private String areaId;
+    private int areaId;
     
-    public String getAreaId() {
+    public int getAreaId() {
 		return areaId;
 	}
 
-	public void setAreaId(String areaId) {
+	public void setAreaId(int areaId) {
 		this.areaId = areaId;
 	}
 	
@@ -70,15 +73,15 @@ public class UserDetail implements Serializable {
     public UserDetail() {
     }
 
-    public UserDetail(String userId) {
+    public UserDetail(Integer userId) {
         this.userId = userId;
     }
 
-    public String getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 

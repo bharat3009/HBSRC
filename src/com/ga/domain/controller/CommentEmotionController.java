@@ -40,10 +40,10 @@ public class CommentEmotionController {
 	 */
 	@RequestMapping(value = "getallcommentEmotionsbyuserid", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public String getCommentEmotionByUser(@RequestParam("userId") String userId) {
+	public String getCommentEmotionByUser(@RequestParam("userId") Integer userId) {
 		LOGGER.info("UserId : " + userId );
 		try {
-			if (userId.isEmpty() ) {
+			if (userId.SIZE == 0 ) {
 				throw new GAException(ErrorCodes.GA_MANDATORY_PARAMETERS_NOT_SET);
 			}
 			// This is call service to get comment for specific user.

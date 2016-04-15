@@ -51,7 +51,7 @@ public class UserMapperImpl implements IUserMapper {
     }
 
 	@Override
-	public UserDetail newUserLogin(String userName, String password, String areaId) throws GAException{
+	public UserDetail newUserLogin(String userName, String password, int areaId) throws GAException{
 		// TODO Auto-generated method stub
 		 System.out.println("Login :" + userName);
 	        Session session = sessionFactory.openSession();

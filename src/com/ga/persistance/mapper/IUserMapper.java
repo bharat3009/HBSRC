@@ -20,7 +20,7 @@ public interface IUserMapper {
     UserDetail userLogin(String userName) throws GAException;
     
     
-    UserDetail newUserLogin(String userName, String password, String areaId) throws GAException;
+    UserDetail newUserLogin(String userName, String password, int areaId) throws GAException;
 
 
 	boolean userExists(String userName);

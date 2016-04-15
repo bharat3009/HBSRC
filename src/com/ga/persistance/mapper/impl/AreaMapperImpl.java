@@ -50,7 +50,7 @@ public class AreaMapperImpl implements IAreaMapper {
 		return areaList;
 	}
 
-	public String areaExists(String[] areaParam) {
+	public Integer areaExists(String[] areaParam) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();

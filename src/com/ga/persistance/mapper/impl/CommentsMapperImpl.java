@@ -35,13 +35,13 @@ public class CommentsMapperImpl implements ICommentsMapper {
     SessionFactory sessionFactory;
     
     private static final String userMainComments = "select ch.*," + 
-															"case when (select agree_flag from comment_emotion where comment_id = ch.comment_id and  user_id = ch.user_id) = 'Y' then 1 else 0 end as agreed," +
-															"case when (select notagree_flag from comment_emotion where comment_id = ch.comment_id and  user_id = ch.user_id) = 'Y' then 1 else 0 end as notagreed " +
+															"case when (select agree_flag from comment_emotion where comment_id = ch.comment_id  and user_id = :userId) = 'Y' then 1 else 0 end as agreed," +
+															"case when (select notagree_flag from comment_emotion where comment_id = ch.comment_id  and user_id = :userId) = 'Y' then 1 else 0 end as notagreed " +
 															" from comment_history ch where ch.user_id = :userId and ch.master_commentid is null ORDER BY ch.comment_date DESC";
     
     private static final String areaMainComments = "select ch.*," + 
-			"case when (select agree_flag from comment_emotion where comment_id = ch.comment_id and  user_id = ch.user_id) = 'Y' then 1 else 0 end as agreed," +
-			"case when (select notagree_flag from comment_emotion where comment_id = ch.comment_id and  user_id = ch.user_id) = 'Y' then 1 else 0 end as notagreed " +
+			"case when (select agree_flag from comment_emotion where comment_id = ch.comment_id and  user_id = ch.user_id and user_id = :userId) = 'Y' then 1 else 0 end as agreed," +
+			"case when (select notagree_flag from comment_emotion where comment_id = ch.comment_id and  user_id = ch.user_id and user_id = :userId) = 'Y' then 1 else 0 end as notagreed " +
 			" from comment_history ch where ch.area_id = :areaId and ch.master_commentid is null ORDER BY ch.comment_date DESC";
 
     /*
@@ -50,9 +50,9 @@ public class CommentsMapperImpl implements ICommentsMapper {
      * @see com.ga.persistance.mapper.ICommentsMapper#uploadFile(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public boolean addComments(String filePath, String comments, String userID, String areaId) {
+    public boolean addComments(String filePath, String comments, int userID, int areaId) {
         Session session = sessionFactory.openSession();
-        session.beginTransaction();
+        session.getTransaction().begin();
 
         CommentHistory commentsHistory = new CommentHistory();
         commentsHistory.setCommentsDetail(comments);
@@ -66,6 +66,9 @@ public class CommentsMapperImpl implements ICommentsMapper {
         simpleDateFormat.setTimeZone(timeZone);
 
         commentsHistory.setCommentDate(calendar.getTime());
+        commentsHistory.setAgreeCount(0);
+        commentsHistory.setNotAgreeCount(0);
+        commentsHistory.setCommentsCount(0);
 
         session.save(commentsHistory);
         session.getTransaction().commit();
@@ -79,9 +82,9 @@ public class CommentsMapperImpl implements ICommentsMapper {
      * @see com.ga.persistance.mapper.ICommentsMapper#getCommentsList(java.lang.String)
      */
     @Override
-    public List<CommentHistory> getCommentsList(String userID) throws GAException {
+    public List<CommentHistory> getCommentsList(int userID) throws GAException {
         Session session = sessionFactory.openSession();
-        session.beginTransaction();
+        session.getTransaction().begin();
         UserDetail userDetail = new UserDetail(userID);
 
         String hql = "FROM CommentHistory where userId =" + userDetail.getUserId() + "ORDER BY commentDate DESC";
@@ -103,7 +106,7 @@ public class CommentsMapperImpl implements ICommentsMapper {
     @Override
     public CommentHistory getCommentByCommentID(int commentID) throws GAException {
         Session session = sessionFactory.openSession();
-        session.beginTransaction();
+        session.getTransaction().begin();
         CommentHistory commentHistory = (CommentHistory) session.get(CommentHistory.class, commentID);
         if (commentHistory == null) {
             throw new GAException(ErrorCodes.GA_DATA_NOT_FOUND);
@@ -120,9 +123,9 @@ public class CommentsMapperImpl implements ICommentsMapper {
      * @see com.ga.persistance.mapper.ICommentsMapper#getCommentsList(java.lang.String)
      */
     @Override
-    public List<CommentDTO> getAllMainCommentsByUser(String userId) throws GAException {
+    public List<CommentDTO> getAllMainCommentsByUser(int userId) throws GAException {
         Session session = sessionFactory.openSession();
-        session.beginTransaction();
+        session.getTransaction().begin();
         UserDetail userDetail = new UserDetail(userId);
        
         //String hql = "FROM CommentHistory where userId =" + userDetail.getUserId() +  " and masterCommentId = null ORDER BY commentDate DESC";
@@ -143,7 +146,7 @@ public class CommentsMapperImpl implements ICommentsMapper {
     @Override
     public List<CommentHistory> getAllComments() throws GAException{
     	Session session = sessionFactory.openSession();
-    	session.beginTransaction();
+    	session.getTransaction().begin();
     	String hql = "FROM CommentHistory ORDER BY commentDate DESC";
     	Query query = session.createQuery(hql);
     	List<CommentHistory> commentList = query.list();
@@ -156,13 +159,15 @@ public class CommentsMapperImpl implements ICommentsMapper {
     }
     
     @Override
-	public List<CommentDTO> getAllMainCommentsByArea(String areaId) throws GAException{
+	public List<CommentDTO> getAllMainCommentsByArea(int areaId,int userId) throws GAException{
     	Session session = sessionFactory.openSession();
-        session.beginTransaction();
+    	session.getTransaction().begin();
         UserDetail userDetail = new UserDetail(areaId);
 
         String hql = "FROM CommentHistory where areaId =" + areaId +  " and masterCommentId = null ORDER BY commentDate DESC";
-        Query query = session.createSQLQuery(areaMainComments).setParameter("areaId", areaId);
+        Query query = session.createSQLQuery(areaMainComments);
+        query.setParameter("areaId", areaId);
+        query.setParameter("userId", userId);
         List<Object> resultList = query.list();
         if (resultList.isEmpty()) {
             throw new GAException(ErrorCodes.GA_DATA_NOT_FOUND);
@@ -171,6 +176,41 @@ public class CommentsMapperImpl implements ICommentsMapper {
         session.close();
         return convertQueryResultTODTO(resultList);
 	}
+    
+    
+    @Override
+    public boolean commentLike(int commentId, String action){
+    	Session session = sessionFactory.openSession();
+    	session.getTransaction().begin();
+    	String hql = "";
+    	if(action.equals("add")){
+    		hql = "update comment_history set agree_count = agree_count + 1 where comment_id = :commentId";
+    	}else if(action.equals("sub")){
+    		hql = "update comment_history set agree_count = agree_count - 1 where comment_id = :commentId";
+    	}
+    	Query query = session.createSQLQuery(hql).setParameter("commentId", commentId);
+    	query.executeUpdate();
+    	 session.getTransaction().commit();
+         session.close();
+    	return true;
+    }
+    
+    @Override
+    public boolean commentUnlike(int commentId, String action){
+    	Session session = sessionFactory.openSession();
+    	session.getTransaction().begin();
+    	String hql = "";
+    	if(action.equals("add")){
+    		hql = "update comment_history set notagree_count = notagree_count + 1 where comment_id = :commentId";
+    	}else if(action.equals("sub")){
+    		hql = "update comment_history set notagree_count = notagree_count - 1 where comment_id = :commentId";
+    	}
+    	Query query = session.createSQLQuery(hql).setParameter("commentId", commentId);
+    	query.executeUpdate();
+    	 session.getTransaction().commit();
+         session.close();
+    	return true;
+    }
 
     
     private List<CommentDTO> convertQueryResultTODTO(List<Object> resultList){
@@ -180,8 +220,8 @@ public class CommentsMapperImpl implements ICommentsMapper {
         	CommentDTO commentDTO =  new CommentDTO();
         	commentDTO.setCommentId((Integer) result[0]);
         	commentDTO.setFilepath((String)result[2]);
-        	commentDTO.setCommentsDetail((String)result[3]);
-        	commentDTO.setCommentDate((Date)result[4]);
+        	commentDTO.setCommentsDetail((String)result[1]);
+        	commentDTO.setCommentDate((Date)result[3]);
         	commentDTO.setAgreeCount((Integer) result[7]);
         	commentDTO.setNotAgreeCount((Integer) result[8]);
         	commentDTO.setCommentsCount((Integer) result[9]);

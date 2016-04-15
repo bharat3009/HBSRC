@@ -17,6 +17,7 @@ import com.ga.common.JsonUtility;
 import com.ga.domain.model.CommentDTO;
 import com.ga.exception.ErrorCodes;
 import com.ga.exception.GAException;
+import com.ga.repository.ICommentEmotionService;
 import com.ga.repository.ICommentsService;
 
 /**
@@ -33,7 +34,10 @@ public class CommentsController {
 
 	/** The comments service. */
 	@Autowired
-	ICommentsService commentsService;     
+	ICommentsService commentsService;    
+	
+	@Autowired
+	ICommentEmotionService commentEmotionService;
 
 	/**
 	 * Adds the comments.
@@ -45,7 +49,7 @@ public class CommentsController {
 	 */
 	@RequestMapping(value = "/addcomments", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public String addComments(@RequestParam("filePath") String filePath, @RequestParam("comments") String comments,
-			@RequestParam("userId") String userId, @RequestParam("areaId") String areaId) {
+			@RequestParam("userId") int userId, @RequestParam("areaId") int areaId) {
 
 		LOGGER.info(String.format("comments : %s,comments : %s, userName : %s, areaId : %s ", filePath, comments, userId, areaId));
 		try {
@@ -120,10 +124,10 @@ public class CommentsController {
 	 */
 	@RequestMapping(value = "getallcommentsbyuserid", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public String getAllCommentsByUser(@RequestParam("userId") String userId, @RequestParam("userTime") Integer userTime) {
+	public String getAllCommentsByUser(@RequestParam("userId") int userId, @RequestParam("userTime") Integer userTime) {
 		LOGGER.info("UserId : " + userId + " User Time " + userTime);
 		try {
-			if (userId.isEmpty() && userTime == null) {
+			if (userId == 0 && userTime == null) {
 				throw new GAException(ErrorCodes.GA_MANDATORY_PARAMETERS_NOT_SET);
 			}
 			// This is call service to get comment for specific user.
@@ -177,10 +181,10 @@ public class CommentsController {
 	 */
 	@RequestMapping(value = "getallmaincommentsbyuserid", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public String getAllMainCommentsByUserId(@RequestParam("userId") String userId, @RequestParam("userTime") Integer userTime) {
+	public String getAllMainCommentsByUserId(@RequestParam("userId") int userId, @RequestParam("userTime") Integer userTime) {
 		LOGGER.info("UserId : " + userId + " User Time " + userTime);
 		try {
-			if (userId.isEmpty() && userTime == null) {
+			if (userId == 0 && userTime == null) {
 				throw new GAException(ErrorCodes.GA_MANDATORY_PARAMETERS_NOT_SET);
 			}
 			// This is call service to get comment for specific user.
@@ -236,7 +240,30 @@ public class CommentsController {
 	 */
 	@RequestMapping(value = "getallmaincommentsbyarea", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public String getAllMainCommentsByAreaId(@RequestParam("areaId") String areaId, @RequestParam("userTime") Integer userTime) {
+	public String getAllMainCommentsByAreaId(@RequestParam("areaId") int areaId,  @RequestParam("userId") Integer userId,@RequestParam("userTime") Integer userTime) {
+		LOGGER.info(" User Time " + userTime);
+		try {
+
+			List<CommentDTO> commentsDtoList = commentsService.getAllMainCommentsByArea(areaId,userId,userTime);
+			System.out.println( "comments " + commentsDtoList);
+			return JsonUtility.getJson(ErrorCodes.GA_TRANSACTION_OK, commentsDtoList);
+		} catch (GAException e) {
+			if (e.getCode() == ErrorCodes.GA_DATA_NOT_FOUND.getErrorCode()) {
+				return JsonUtility.getJson(ErrorCodes.GA_DATA_NOT_FOUND, null);
+
+			} else if (e.getCode() == ErrorCodes.GA_MANDATORY_PARAMETERS_NOT_SET.getErrorCode()) {
+				return JsonUtility.getJson(ErrorCodes.GA_MANDATORY_PARAMETERS_NOT_SET, null);
+
+			} else {
+				return JsonUtility.getJson(ErrorCodes.GA_INTERNAL, null);
+			}
+		}
+	}
+	
+	
+	/*@RequestMapping(value="gethotbyarea", method= RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String getHotCommentsByArea(@RequestParam("areaId") int areaId, @RequestParam("userTime") Integer userTime) {
 		LOGGER.info(" User Time " + userTime);
 		try {
 
@@ -254,18 +281,53 @@ public class CommentsController {
 				return JsonUtility.getJson(ErrorCodes.GA_INTERNAL, null);
 			}
 		}
-	}
+	}*/
 	
 	
-	@RequestMapping(value="gethotbyarea", method= RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "getemotion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public String getHotCommentsByArea(@RequestParam("areaId") String areaId, @RequestParam("userTime") Integer userTime) {
-		LOGGER.info(" User Time " + userTime);
+	public String userReacted(@RequestParam("action") String action,@RequestParam("presentAction") String presentAction, @RequestParam("liked") char liked, @RequestParam("unliked") char unliked,
+			@RequestParam("commentId") int commentId, @RequestParam("userId") int userId) {
+		LOGGER.info("action : " + action + " liked " + liked);
 		try {
-
-			List<CommentDTO> commentsDtoList = commentsService.getAllMainCommentsByArea(areaId,userTime);
-			System.out.println( "comments " + commentsDtoList);
-			return JsonUtility.getJson(ErrorCodes.GA_TRANSACTION_OK, commentsDtoList);
+			if (action.isEmpty()) {
+				throw new GAException(ErrorCodes.GA_MANDATORY_PARAMETERS_NOT_SET);
+			}
+			if(action.equals("liked")){
+				System.out.println("liked");
+				if(presentAction.equals("noaction")) {
+					System.out.println("liked");
+					commentEmotionService.addEmotion(userId, commentId, 'Y', 'N');
+					commentsService.commentLike(commentId, "add");
+				
+				} else if(presentAction.equals("unliked")) {
+					commentEmotionService.removeEmotion(userId, commentId);
+					commentEmotionService.addEmotion(userId, commentId, 'Y', 'N');
+					commentsService.commentUnlike(commentId, "sub");
+					commentsService.commentLike(commentId, "add");
+				}else if(presentAction.equals("liked")) {
+					commentEmotionService.removeEmotion(userId, commentId);
+					commentsService.commentLike(commentId, "sub");
+				}
+				
+			} else if(action.equals("unliked")) {
+				if(presentAction.equals("noaction")) {
+					commentEmotionService.addEmotion(userId, commentId, 'N', 'Y');
+					commentsService.commentUnlike(commentId, "add");
+					
+				} else if(presentAction.equals("liked")) {
+					commentEmotionService.removeEmotion(userId, commentId);
+					commentEmotionService.addEmotion(userId, commentId, 'N', 'Y');
+					commentsService.commentLike(commentId, "sub");
+					commentsService.commentUnlike(commentId, "add");
+				}else if(presentAction.equals("unliked")) {
+					commentEmotionService.removeEmotion(userId, commentId);
+					commentsService.commentUnlike(commentId, "sub");
+				}
+			}
+			// This is call service to get comment for specific user.
+			
+			return JsonUtility.getJson(ErrorCodes.GA_TRANSACTION_OK, null);
 		} catch (GAException e) {
 			if (e.getCode() == ErrorCodes.GA_DATA_NOT_FOUND.getErrorCode()) {
 				return JsonUtility.getJson(ErrorCodes.GA_DATA_NOT_FOUND, null);

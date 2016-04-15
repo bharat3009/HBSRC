@@ -20,7 +20,7 @@ public interface IUserService {
      */
     UserDTO userLogin(String username, String password) throws GAException;
 
-    UserDTO newUserLogin(String username, String password, String areaId) throws GAException;
+    UserDTO newUserLogin(String username, String password, int areaId) throws GAException;
 
 	boolean userExists(String userName);
 

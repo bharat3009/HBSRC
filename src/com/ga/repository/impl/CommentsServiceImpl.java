@@ -48,7 +48,7 @@ public class CommentsServiceImpl implements ICommentsService {
      * @see com.ga.repository.ICommentsService#addComments(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public boolean addComments(String filePath, String comments, String userID, String areaId) throws GAException {
+    public boolean addComments(String filePath, String comments, int userID, int areaId) throws GAException {
         LOGGER.info("Upload file called!!");
         boolean result = commentsMapper.addComments(filePath, comments, userID, areaId);
 
@@ -67,7 +67,7 @@ public class CommentsServiceImpl implements ICommentsService {
      * @see com.ga.repository.ICommentsService#getCommentsList(java.lang.String)
      */
     @Override
-    public List<CommentDTO> getCommentsList(String userID, Integer userTime) throws GAException {
+    public List<CommentDTO> getCommentsList(int userID, Integer userTime) throws GAException {
         LOGGER.info("Get commemts list called!!");
         List<CommentHistory> commentHistoryList = commentsMapper.getCommentsList(userID);
         List<CommentDTO> commentsDtoList = new ArrayList<CommentDTO>();
@@ -214,7 +214,7 @@ public class CommentsServiceImpl implements ICommentsService {
      * @see com.ga.repository.ICommentsService#getCommentsList(java.lang.String)
      */
     @Override
-    public List<CommentDTO> getAllMainCommentsListByUserId(String userId, Integer userTime) throws GAException {
+    public List<CommentDTO> getAllMainCommentsListByUserId(int userId, Integer userTime) throws GAException {
         LOGGER.info("Get commemts list called!!");
         List<CommentDTO> commentHistoryList = commentsMapper.getAllMainCommentsByUser(userId);
         //List<CommentDTO> commentsDtoList = new ArrayList<CommentDTO>();
@@ -258,10 +258,10 @@ public class CommentsServiceImpl implements ICommentsService {
     }
     
     @Override
-    public List<CommentDTO> getAllMainCommentsByArea(String areaId, Integer userTime) throws GAException {
+    public List<CommentDTO> getAllMainCommentsByArea(int areaId,int userId, Integer userTime) throws GAException {
     	LOGGER.info("Get all main comments list by area");
         List<CommentDTO> commentsDtoList = new ArrayList<CommentDTO>();
-        List<CommentDTO> commentList = commentsMapper.getAllMainCommentsByArea(areaId);
+        List<CommentDTO> commentList = commentsMapper.getAllMainCommentsByArea(areaId,userId);
         if(commentList.isEmpty()){
         	throw new GAException(ErrorCodes.GA_INTERNAL);
         }
@@ -276,5 +276,16 @@ public class CommentsServiceImpl implements ICommentsService {
             LOGGER.info("CommentsDtoList : " + commentsDtoList.toString());
             return commentList;
         }
+    }
+    
+    @Override
+    public boolean commentLike(int commentId, String action){
+    	
+    	return commentsMapper.commentLike(commentId, action);
+    }
+    
+    @Override
+	public boolean commentUnlike(int commentId, String action){
+    	return commentsMapper.commentUnlike(commentId, action);
     }
 }

@@ -39,8 +39,8 @@ public class CommentHistory implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @Column(name = "comment_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "comment_id" )
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Expose
     private Integer commentId;
     @Column(name = "filepath")
@@ -75,7 +75,7 @@ public class CommentHistory implements Serializable {
     @Column(name = "comments_count")
     @Expose
     private Integer commentsCount;
-
+/*
     private Boolean agreed;
     private Boolean notAgreed;
     
@@ -94,7 +94,7 @@ public class CommentHistory implements Serializable {
 	public void setNotAgreed(Boolean notAgreed) {
 		this.notAgreed = notAgreed;
 	}
-
+*/
     public Integer getMasterCommentId() {
 		return masterCommentId;
 	}

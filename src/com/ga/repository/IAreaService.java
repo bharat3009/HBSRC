@@ -10,6 +10,6 @@ public interface IAreaService {
 
 	List<AreaDTO> getAllAreas();
 
-	String getAreaId(String area);
+	int getAreaId(String area);
 
 }

@@ -60,14 +60,14 @@ public class AreaServiceImpl implements IAreaService{
 	}
 	
 	@Override
-	public String getAreaId(String area) {
+	public int getAreaId(String area) {
 		String[] areaParam = area.split(",");
-		String areaExists = areaMapper.areaExists(areaParam);
+		Integer areaExists = areaMapper.areaExists(areaParam);
 		if(areaExists != null){
 			return areaExists;
 		}else{
 			areaMapper.createAreaId(areaParam);
-			String areaId = areaMapper.areaExists(areaParam);
+			int areaId = areaMapper.areaExists(areaParam);
 			return areaId;
 		}
 		

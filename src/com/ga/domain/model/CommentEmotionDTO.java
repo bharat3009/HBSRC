@@ -3,7 +3,7 @@ package com.ga.domain.model;
 public class CommentEmotionDTO {
 	
 	private Integer commentEmotionId;
-	private String userId;
+	private int userId;
 	private Integer commentId;
 	private char agreed;
 	private char notAgreed;
@@ -14,10 +14,10 @@ public class CommentEmotionDTO {
 	public void setCommentEmotionId(Integer commentEmotionId) {
 		this.commentEmotionId = commentEmotionId;
 	}
-	public String getUserId() {
+	public int getUserId() {
 		return userId;
 	}
-	public void setUserId(String userId) {
+	public void setUserId(int userId) {
 		this.userId = userId;
 	}
 	public Integer getCommentId() {

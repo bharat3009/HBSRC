@@ -2,11 +2,11 @@ package com.ga.domain.model;
 
 public class AreaDTO {
 
-	private String areaId;
-	public String getAreaId() {
+	private int areaId;
+	public int getAreaId() {
 		return areaId;
 	}
-	public void setAreaId(String areaId) {
+	public void setAreaId(int areaId) {
 		this.areaId = areaId;
 	}
 	public String getAreaValue() {

@@ -82,9 +82,9 @@ public class UserController {
      * @param password the password
      * @return the string
      */
-    @RequestMapping(value = "/newAuth", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/newAuth", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public String newUserLogin(@RequestParam("username") String username, @RequestParam("password") String password, @RequestParam String area) {
+    public String newUserLogin(@RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("area") String area) {
         LOGGER.info("User login called!!");
 
         try {
@@ -92,11 +92,11 @@ public class UserController {
                 throw new GAException(ErrorCodes.GA_MANDATORY_PARAMETERS_NOT_SET);
             }
             if(!userService.userExists(username)){
-		            String areaId = areaService.getAreaId(area);
+		            int areaId = areaService.getAreaId(area);
 		            // This is return user after credential match
 		            UserDTO userDto = userService.newUserLogin(username, password, areaId);
 		            LOGGER.info("User account creation complete!!");
-		            return JsonUtility.getJson(ErrorCodes.GA_TRANSACTION_OK, null);
+		            return JsonUtility.getJson(ErrorCodes.GA_TRANSACTION_OK, userDto);
             }else{
             	 return JsonUtility.getJson(ErrorCodes.GA_MANDATORY_USER_EXISTS, null);
             }

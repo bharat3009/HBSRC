@@ -30,7 +30,7 @@ public class CommentEmotion implements Serializable{
     @Id
     @Basic(optional = false)
     @Column(name = "comment_emotionid")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Expose
     private Integer commentEmotionId;
     
@@ -38,7 +38,7 @@ public class CommentEmotion implements Serializable{
 
 	@Column(name = "user_id")
     @Expose  
-    private String userId;
+    private int userId;
     
     @JoinColumn(name = "comment_id", referencedColumnName = "comment_id")
     @ManyToOne
@@ -52,11 +52,11 @@ public class CommentEmotion implements Serializable{
     @Expose
     private char notAgreeFlag;
 
-	public String getUserId() {
+	public int getUserId() {
 		return userId;
 	}
 
-	public void setUserId(String userId) {
+	public void setUserId(int userId) {
 		this.userId = userId;
 	}
 

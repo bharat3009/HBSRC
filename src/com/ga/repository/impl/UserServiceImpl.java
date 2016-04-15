@@ -52,7 +52,7 @@ public class UserServiceImpl implements IUserService {
     }
 
 	@Override
-	public UserDTO newUserLogin(String userName, String password , String areaId) throws GAException {
+	public UserDTO newUserLogin(String userName, String password , int areaId) throws GAException {
 		// TODO Auto-generated method stub
 		LOGGER.info("User Login Service called!!");
 		UserDetail userDetail = userMapper.newUserLogin(userName, password, areaId);

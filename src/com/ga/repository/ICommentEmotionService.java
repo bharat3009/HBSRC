@@ -8,5 +8,8 @@ import com.ga.persistance.entity.CommentEmotion;
 
 public interface ICommentEmotionService {
 	
-	List<CommentEmotionDTO> getCommentEmotionByUser(String userId) throws GAException;
+	List<CommentEmotionDTO> getCommentEmotionByUser(int userId) throws GAException;
+	public boolean addEmotion(int userId, int commentId, char liked, char unliked);
+	void removeEmotion(int userId, int commentId);
+	
 }

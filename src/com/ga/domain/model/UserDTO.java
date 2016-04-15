@@ -8,27 +8,27 @@ package com.ga.domain.model;
 public class UserDTO {
 
     /** The user id. */
-    private String userId;
+    private int userId;
 
     /** The user name. */
     private String userName;
     
-    public String getAreaId() {
+    public int getAreaId() {
 		return areaId;
 	}
 
-	public void setAreaId(String areaId) {
+	public void setAreaId(int areaId) {
 		this.areaId = areaId;
 	}
 
-	private String areaId;
+	private int areaId;
 
     /**
      * Gets the user id.
      *
      * @return the user id
      */
-    public String getUserId() {
+    public int getUserId() {
         return userId;
     }
 
@@ -37,7 +37,7 @@ public class UserDTO {
      *
      * @param userId the new user id
      */
-    public void setUserId(String userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 

@@ -30,7 +30,7 @@ public class GetSchedulerTask extends TimerTask {
         ICommentsMapper mapper = new CommentsMapperImpl();
 
         try {
-            List<CommentHistory> list = mapper.getCommentsList("1");
+            List<CommentHistory> list = mapper.getCommentsList(1);
             System.out.println("Size :" + list.size());
             LOGGER.info("Scheduler job called successfully");
         } catch (Exception e) {

@@ -33,9 +33,9 @@ public class Area implements Serializable {
 	    @Id
 	    @Basic(optional = false)
 	    @Column(name = "AreaId")
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    @GeneratedValue(strategy = GenerationType.AUTO)
 	    @Expose
-	    private String areaId;
+	    private Integer areaId;
 	    
 	    @Column(name = "AreaName")
 	    @Expose
@@ -84,15 +84,15 @@ public class Area implements Serializable {
 	    	
 	    }
 	    
-	    public Area(String areaId){
+	    public Area(Integer areaId){
 	    	this.areaId = areaId;
 	    }
 
-		public String getAreaId() {
+		public Integer getAreaId() {
 			return areaId;
 		}
 
-		public void setAreaId(String areaId) {
+		public void setAreaId(Integer areaId) {
 			this.areaId = areaId;
 		}
 

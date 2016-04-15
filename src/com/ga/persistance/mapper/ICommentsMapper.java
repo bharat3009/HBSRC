@@ -31,7 +31,7 @@ public interface ICommentsMapper {
      * @return the comments list
      * @throws GAException 
      */
-    List<CommentHistory> getCommentsList(String userID) throws GAException;
+    List<CommentHistory> getCommentsList(int userID) throws GAException;
 
     /**
      * Gets the comment by comment id.
@@ -42,15 +42,17 @@ public interface ICommentsMapper {
      */
     CommentHistory getCommentByCommentID(int commentID) throws GAException;
 
-    List<CommentDTO> getAllMainCommentsByUser(String userId) throws GAException;
+    List<CommentDTO> getAllMainCommentsByUser(int userId) throws GAException;
 	
     List<CommentHistory> getAllComments() throws GAException;
 
-	List<CommentDTO> getAllMainCommentsByArea(String areaId) throws GAException;
+	List<CommentDTO> getAllMainCommentsByArea(int areaId,int userId) throws GAException;
 
-	boolean addComments(String filePath, String comments, String userID,
-			String areaId);
+	boolean addComments(String filePath, String comments, int userID,
+			int areaId);
 
+	public boolean commentUnlike(int commentId, String action);
 	
+	public boolean commentLike(int commentId, String action);
 	
 }

@@ -27,7 +27,7 @@ public class CommentEmotionServiceImpl implements ICommentEmotionService{
     @Autowired
     ICommentEmotionMapper commentsMapper;
 	@Override
-	public List<CommentEmotionDTO> getCommentEmotionByUser(String userId)
+	public List<CommentEmotionDTO> getCommentEmotionByUser(int userId)
 			throws GAException {
 		// TODO Auto-generated method stub
 		 LOGGER.info("Get commemts list called!!");
@@ -52,6 +52,13 @@ public class CommentEmotionServiceImpl implements ICommentEmotionService{
 	}
 	
 	
+	public boolean addEmotion(int userId, int commentId, char liked, char unliked) {
+		
+		
+		return commentsMapper.addEmotion(userId, commentId, liked, unliked);
+	}
+	
+	
 	 /**
      * Convert entity to dto.
      *
@@ -69,5 +76,13 @@ public class CommentEmotionServiceImpl implements ICommentEmotionService{
         
         return commentEmotionDto;
     }
+
+
+	@Override
+	public void removeEmotion(int userId, int commentId) {
+		// TODO Auto-generated method stub
+		 commentsMapper.removeEmotion(userId, commentId);
+		
+	}
 
 }

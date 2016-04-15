@@ -22,7 +22,7 @@ public class CommentEmotionMapperImpl implements ICommentEmotionMapper {
 	    SessionFactory sessionFactory;
 
 	@Override
-	public List<CommentEmotion> getCommentEmotionByUser(String userId) throws GAException { 
+	public List<CommentEmotion> getCommentEmotionByUser(int userId) throws GAException { 
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		UserDetail userDetail = new UserDetail(userId);
@@ -36,6 +36,39 @@ public class CommentEmotionMapperImpl implements ICommentEmotionMapper {
 	    session.close();
 	    System.out.println(commentEmotionList);
 	    return commentEmotionList;
+	}
+
+	@Override
+	public boolean addEmotion(int userId, int commentId, char liked,
+			char unliked) {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.openSession();
+		session.getTransaction().begin();
+		CommentHistory commentHistory = new CommentHistory(commentId);
+		CommentEmotion commentEmotion = new CommentEmotion();
+		commentEmotion.setCommentid(commentHistory);
+		commentEmotion.setUserId(userId);
+		commentEmotion.setAgreeFlag(liked);
+		commentEmotion.setNotAgreeFlag(unliked);
+		session.save(commentEmotion);
+        session.getTransaction().commit();
+        session.close();
+        return true;
+	}
+
+	@Override
+	public void removeEmotion(int userId, int commentId) {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.openSession();
+		session.getTransaction().begin();
+		String hql = "delete from comment_emotion where comment_id = :commentId and user_id = :userId";
+		Query query = session.createSQLQuery(hql);
+		query.setParameter("commentId", commentId);
+		query.setParameter("userId", userId);
+		query.executeUpdate();
+        session.getTransaction().commit();
+        session.close();
+		
 	}
 	
 	   
