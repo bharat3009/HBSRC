@@ -18,7 +18,7 @@ import com.google.gson.annotations.Expose;
 
 
 @Entity
-@Table(name = "Area")
+@Table(name = "area")
 @XmlRootElement
 @NamedQueries({
         @NamedQuery(name = "Area.findAll", query = "SELECT c FROM Area c"),

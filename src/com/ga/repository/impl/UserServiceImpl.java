@@ -1,5 +1,8 @@
 package com.ga.repository.impl;
 
+import java.sql.ResultSet;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +55,10 @@ public class UserServiceImpl implements IUserService {
     }
 
 	@Override
-	public UserDTO newUserLogin(String userName, String password , int areaId) throws GAException {
+	public UserDTO newUserLogin(String userName, String password , int areaId, String showName) throws GAException {
 		// TODO Auto-generated method stub
 		LOGGER.info("User Login Service called!!");
-		UserDetail userDetail = userMapper.newUserLogin(userName, password, areaId);
+		UserDetail userDetail = userMapper.newUserLogin(userName, password, areaId, showName);
 
 		userDetail = userMapper.userLogin(userName);
 
@@ -80,5 +83,11 @@ public class UserServiceImpl implements IUserService {
 
 	       
 		return userDetail;
+	}
+
+	@Override
+	public List<Object> getUserNames() {
+		// TODO Auto-generated method stub
+		return userMapper.getUserNames();
 	}
 }

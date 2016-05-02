@@ -31,8 +31,28 @@ public class CommentDTO {
     private Boolean agreed;
     
     private Boolean notAgreed;
+    
+    private Boolean showNameFlag;
 
-    /**
+    private String userName;
+    
+    public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	
+    public Boolean getShowNameFlag() {
+		return showNameFlag;
+	}
+
+	public void setShowNameFlag(Boolean showNameFlag) {
+		this.showNameFlag = showNameFlag;
+	}
+
+	/**
      * Gets the comment id.
      *
      * @return the comment id

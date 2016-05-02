@@ -75,7 +75,34 @@ public class CommentHistory implements Serializable {
     @Column(name = "comments_count")
     @Expose
     private Integer commentsCount;
-/*
+    
+    @Column(name = "showname_flag")
+    @Expose
+    private char showNameFlag;
+    
+    @Column(name = "user_name")
+    @Expose
+    private String userName;
+    
+    
+    
+    public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public char getShowNameFlag() {
+		return showNameFlag;
+	}
+
+	public void setShowNameFlag(char showNameFlag) {
+		this.showNameFlag = showNameFlag;
+	}
+
+	/*
     private Boolean agreed;
     private Boolean notAgreed;
     

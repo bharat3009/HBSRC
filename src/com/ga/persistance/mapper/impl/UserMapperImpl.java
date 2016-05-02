@@ -1,5 +1,6 @@
 package com.ga.persistance.mapper.impl;
 
+import java.sql.ResultSet;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -51,7 +52,7 @@ public class UserMapperImpl implements IUserMapper {
     }
 
 	@Override
-	public UserDetail newUserLogin(String userName, String password, int areaId) throws GAException{
+	public UserDetail newUserLogin(String userName, String password, int areaId, String showName) throws GAException{
 		// TODO Auto-generated method stub
 		 System.out.println("Login :" + userName);
 	        Session session = sessionFactory.openSession();
@@ -60,6 +61,7 @@ public class UserMapperImpl implements IUserMapper {
 	        userDetail.setUserName(userName);
 	        userDetail.setPassword(password);
 	        userDetail.setAreaId(areaId);
+	        userDetail.setShowName(showName);
 	        session.save(userDetail);
 	        
 	        session.getTransaction().commit();
@@ -86,5 +88,16 @@ public class UserMapperImpl implements IUserMapper {
         } else {
             return true;
         }
+	}
+
+	@Override
+	public List<Object> getUserNames() {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.openSession();
+		session.getTransaction().begin();
+		String hql = "select show_name from user_detail";
+		Query query = session.createSQLQuery(hql);
+		List<Object> result = query.list();
+		return result;
 	}
 }

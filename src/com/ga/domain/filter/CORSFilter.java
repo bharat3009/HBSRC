@@ -21,12 +21,8 @@ public class CORSFilter extends OncePerRequestFilter {
     /** The Constant LOG. */
     private static final Log LOG = LogFactory.getLog(CORSFilter.class);
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.springframework.web.filter.OncePerRequestFilter#doFilterInternal(javax.servlet.http.HttpServletRequest,
-     * javax.servlet.http.HttpServletResponse, javax.servlet.FilterChain)
-     */
+    
+   
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {

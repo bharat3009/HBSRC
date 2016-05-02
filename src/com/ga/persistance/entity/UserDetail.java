@@ -45,9 +45,20 @@ public class UserDetail implements Serializable {
     private String userName;
     @Column(name = "password")
     private String password;
-    @Column(name = "area_id")
+	@Column(name = "area_id")
     private int areaId;
+    @Column(name = "show_name")
+    private String showName;
     
+    
+    public String getShowName() {
+		return showName;
+	}
+
+	public void setShowName(String showName) {
+		this.showName = showName;
+	}
+	
     public int getAreaId() {
 		return areaId;
 	}

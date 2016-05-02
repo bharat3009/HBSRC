@@ -60,9 +60,17 @@ public interface ICommentsService {
 	List<CommentDTO> getAllMainCommentsByArea(int areaId, int userId,Integer userTime) throws GAException;
 
 	boolean addComments(String filePath, String comments, int userID,
-			int areaId) throws GAException;
+			int areaId, int mainCommentId, char showNameFlag) throws GAException;
 	
 	boolean commentLike(int commentId, String action);
 	boolean commentUnlike(int commentId, String action);
 
+	List<CommentDTO> getAllSubComments(int mainCommentId, int userId,
+			Integer userTime) throws GAException;
+
+	List<CommentDTO> getGlobalCommentsList(int userId, Integer userTime) throws GAException;
+
+	/*boolean addSubComments(String filePath, String comments, int userId,
+			int areaId, int mainCommentId) throws GAException;
+*/
 }

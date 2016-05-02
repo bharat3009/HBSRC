@@ -84,7 +84,7 @@ public class UserController {
      */
     @RequestMapping(value = "/newAuth", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public String newUserLogin(@RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("area") String area) {
+    public String newUserLogin(@RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("area") String area, @RequestParam("showName") String showName) {
         LOGGER.info("User login called!!");
 
         try {
@@ -94,7 +94,7 @@ public class UserController {
             if(!userService.userExists(username)){
 		            int areaId = areaService.getAreaId(area);
 		            // This is return user after credential match
-		            UserDTO userDto = userService.newUserLogin(username, password, areaId);
+		            UserDTO userDto = userService.newUserLogin(username, password, areaId, showName);
 		            LOGGER.info("User account creation complete!!");
 		            return JsonUtility.getJson(ErrorCodes.GA_TRANSACTION_OK, userDto);
             }else{
@@ -116,6 +116,13 @@ public class UserController {
                 return JsonUtility.getJson(ErrorCodes.GA_DATA_NOT_FOUND, null);
             }
         }
+    }
+    
+    @RequestMapping(value = "/availability", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String getUserNameList() {
+    	
+    	return JsonUtility.getJson(ErrorCodes.GA_TRANSACTION_OK, userService.getUserNames());
     }
     
     

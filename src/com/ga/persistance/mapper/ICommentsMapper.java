@@ -49,10 +49,18 @@ public interface ICommentsMapper {
 	List<CommentDTO> getAllMainCommentsByArea(int areaId,int userId) throws GAException;
 
 	boolean addComments(String filePath, String comments, int userID,
-			int areaId);
+			int areaId, int mainCommentId, char showNameFlag);
 
 	public boolean commentUnlike(int commentId, String action);
 	
 	public boolean commentLike(int commentId, String action);
+
+	List<CommentDTO> getAllSubComments(int mainCommentId, int areaId)
+			throws GAException;
+
+	List<CommentDTO> getGlobalComments(int userId) throws GAException;
+
+	/*boolean addSubComments(String filePath, String comments, int userId,
+			int areaId, int mainCommentId);*/
 	
 }

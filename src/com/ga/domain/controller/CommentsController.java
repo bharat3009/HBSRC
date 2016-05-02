@@ -1,6 +1,14 @@
 package com.ga.domain.controller;
 
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +46,55 @@ public class CommentsController {
 	
 	@Autowired
 	ICommentEmotionService commentEmotionService;
+	
+	@RequestMapping(value = "/image", method = RequestMethod.GET, headers = {"ACCEPT=text/xml, application/json, image/jpg"} , produces = MediaType.ALL_VALUE)
+	public String getImage(@RequestParam("filename") String fileName){
+		System.out.println(fileName);
+		File file = new File("C:/xampp/htdocs/Feedbacktool/images/" + fileName);
+		try {
+	        // Retrieve image from the classpath.
+	        InputStream is = this.getClass().getResourceAsStream("C:/xampp/htdocs/Feedbacktool/images/" + fileName); 
+	        
+	        // Prepare buffered image.
+	        BufferedImage img = ImageIO.read(file);
 
+	        // Create a byte array output stream.
+	        ByteArrayOutputStream bao = new ByteArrayOutputStream();
+
+	        // Write to output stream
+	        ImageIO.write(img, "jpg", bao);
+	        String b64 = javax.xml.bind.DatatypeConverter.printBase64Binary(bao.toByteArray());
+	        b64 = "data:image/JPEG;base64" + b64;
+	       return JsonUtility.getJson(ErrorCodes.GA_TRANSACTION_OK, b64);
+	    } catch (IOException e) {
+	        System.out.println("eror");
+	        return JsonUtility.getJson(ErrorCodes.GA_INTERNAL, null);	    }
+		
+	}
+	
+	@RequestMapping(value = "/imagebyte", method = RequestMethod.GET, headers = {"ACCEPT=text/xml, application/json, image/jpg"} , produces = MediaType.ALL_VALUE)
+	public String getImageByte(@RequestParam("filename") String fileName){
+		System.out.println(fileName);
+		File file = new File("C:/xampp/htdocs/Feedbacktool/images/" + fileName);
+		try {
+	        // Retrieve image from the classpath.
+	        InputStream is = this.getClass().getResourceAsStream("C:/xampp/htdocs/Feedbacktool/images/" + fileName); 
+	        
+	        // Prepare buffered image.
+	        BufferedImage img = ImageIO.read(file);
+
+	        // Create a byte array output stream.
+	        ByteArrayOutputStream bao = new ByteArrayOutputStream();
+
+	        // Write to output stream
+	        ImageIO.write(img, "jpg", bao);
+	        String b64 = javax.xml.bind.DatatypeConverter.printBase64Binary(bao.toByteArray());
+	       return b64;
+	    } catch (IOException e) {
+	        System.out.println("eror");
+	        return JsonUtility.getJson(ErrorCodes.GA_INTERNAL, null);	    }
+		
+	}
 	/**
 	 * Adds the comments.
 	 *
@@ -49,15 +105,15 @@ public class CommentsController {
 	 */
 	@RequestMapping(value = "/addcomments", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public String addComments(@RequestParam("filePath") String filePath, @RequestParam("comments") String comments,
-			@RequestParam("userId") int userId, @RequestParam("areaId") int areaId) {
+			@RequestParam("userId") int userId, @RequestParam("areaId") int areaId, @RequestParam("mainCommentId") int mainCommentId, @RequestParam("showMyName") char showNameFlag) {
 
 		LOGGER.info(String.format("comments : %s,comments : %s, userName : %s, areaId : %s ", filePath, comments, userId, areaId));
 		try {
 			if (filePath.isEmpty() || comments.isEmpty()) {
 				throw new GAException(ErrorCodes.GA_MANDATORY_PARAMETERS_NOT_SET);
 			}
-
-			boolean resultSaveComment = commentsService.addComments(filePath, comments, userId, areaId);
+			
+			boolean resultSaveComment = commentsService.addComments(filePath, comments, userId, areaId, mainCommentId, showNameFlag);
 			if (!resultSaveComment) {
 				LOGGER.info("File upload error");
 				throw new GAException(ErrorCodes.GA_FILE_UPLOAD);
@@ -79,6 +135,42 @@ public class CommentsController {
 			}
 		}
 	}
+	
+	
+	/*@RequestMapping(value = "/addsubcomments", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public String addSubComments(@RequestParam("filePath") String filePath, @RequestParam("comments") String comments,
+			@RequestParam("userId") int userId, @RequestParam("areaId") int areaId, @RequestParam("mainCommentId") int mainCommentId) {
+
+		LOGGER.info(String.format("comments : %s,comments : %s, userName : %s, areaId : %s ", filePath, comments, userId, areaId));
+		try {
+			if (filePath.isEmpty() || comments.isEmpty()) {
+				throw new GAException(ErrorCodes.GA_MANDATORY_PARAMETERS_NOT_SET);
+			}
+
+			boolean resultSaveComment = commentsService.addSubComments(filePath, comments, userId, areaId,mainCommentId);
+			if (!resultSaveComment) {
+				LOGGER.info("File upload error");
+				throw new GAException(ErrorCodes.GA_FILE_UPLOAD);
+			}
+			LOGGER.info("File upload successfull");
+			return JsonUtility.getJson(ErrorCodes.GA_TRANSACTION_OK, null);
+
+		} catch (GAException e) {
+			e.printStackTrace();
+			if (e.getCode() == ErrorCodes.GA_FILE_UPLOAD.getErrorCode()) {
+				LOGGER.info("File upload error");
+				return JsonUtility.getJson(ErrorCodes.GA_FILE_UPLOAD, null);
+			} else if (e.getCode() == ErrorCodes.GA_MANDATORY_PARAMETERS_NOT_SET.getErrorCode()) {
+				LOGGER.info("Parameter not set");
+				return JsonUtility.getJson(ErrorCodes.GA_MANDATORY_PARAMETERS_NOT_SET, null);
+			} else {
+				LOGGER.info("Internal error. Obj is null");
+				return JsonUtility.getJson(ErrorCodes.GA_INTERNAL, null);
+			}
+		}
+	}
+	*/
+	
 
 	/**
 	 * Upload file.
@@ -101,7 +193,7 @@ public class CommentsController {
 			if (resultFilePath.isEmpty()) {
 				throw new GAException(ErrorCodes.GA_FILE_UPLOAD);
 			}
-			commentDto.setFilepath("comments/" + resultFilePath);
+			commentDto.setFilepath("images/" + resultFilePath);
 			return JsonUtility.getJson(ErrorCodes.GA_TRANSACTION_OK, commentDto);
 		} catch (GAException e) {
 			if (e.getCode() == ErrorCodes.GA_FILE_UPLOAD.getErrorCode()) {
@@ -146,6 +238,38 @@ public class CommentsController {
 		}
 	}
 
+	
+	/**
+	 * Gets the all comments.
+	 *
+	 * @param userId the user id
+	 * @return the all comments
+	 */
+	@RequestMapping(value = "getallglobalcommentsbyuser", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String getGlobalCommentsByUser(@RequestParam("userId") Integer userId, @RequestParam("userTime") Integer userTime) {
+		LOGGER.info( " User Time " + userTime);
+		try {
+			/*if (userId == 0 && userTime == null) {
+				throw new GAException(ErrorCodes.GA_MANDATORY_PARAMETERS_NOT_SET);
+			}*/
+			// This is call service to get comment for specific user.
+			List<CommentDTO> commentsDtoList = commentsService.getGlobalCommentsList(userId, userTime);
+			return JsonUtility.getJson(ErrorCodes.GA_TRANSACTION_OK, commentsDtoList);
+		} catch (GAException e) {
+			if (e.getCode() == ErrorCodes.GA_DATA_NOT_FOUND.getErrorCode()) {
+				return JsonUtility.getJson(ErrorCodes.GA_DATA_NOT_FOUND, null);
+
+			} else if (e.getCode() == ErrorCodes.GA_MANDATORY_PARAMETERS_NOT_SET.getErrorCode()) {
+				return JsonUtility.getJson(ErrorCodes.GA_MANDATORY_PARAMETERS_NOT_SET, null);
+
+			} else {
+				return JsonUtility.getJson(ErrorCodes.GA_INTERNAL, null);
+			}
+		}
+	}
+
+	
 	/**
 	 * Gets the comment by id.
 	 *
@@ -260,6 +384,34 @@ public class CommentsController {
 		}
 	}
 	
+	
+	/**
+	 * Gets the all main comments by area.
+	 *
+	 * @param areaId the area id
+	 * @return the all comments
+	 */
+	@RequestMapping(value = "getallsubcommentsbycommentid", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String getAllSubCommentsByCommentId(@RequestParam("mainCommentId") int mainCommentId,  @RequestParam("userId") Integer userId,@RequestParam("userTime") Integer userTime) {
+		LOGGER.info(" User Time " + userTime);
+		try {
+
+			List<CommentDTO> commentsDtoList = commentsService.getAllSubComments(mainCommentId,userId,userTime);
+			System.out.println( "comments " + commentsDtoList);
+			return JsonUtility.getJson(ErrorCodes.GA_TRANSACTION_OK, commentsDtoList);
+		} catch (GAException e) {
+			if (e.getCode() == ErrorCodes.GA_DATA_NOT_FOUND.getErrorCode()) {
+				return JsonUtility.getJson(ErrorCodes.GA_DATA_NOT_FOUND, null);
+
+			} else if (e.getCode() == ErrorCodes.GA_MANDATORY_PARAMETERS_NOT_SET.getErrorCode()) {
+				return JsonUtility.getJson(ErrorCodes.GA_MANDATORY_PARAMETERS_NOT_SET, null);
+
+			} else {
+				return JsonUtility.getJson(ErrorCodes.GA_INTERNAL, null);
+			}
+		}
+	}
 	
 	/*@RequestMapping(value="gethotbyarea", method= RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody

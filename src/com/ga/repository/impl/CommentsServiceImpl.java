@@ -48,9 +48,9 @@ public class CommentsServiceImpl implements ICommentsService {
      * @see com.ga.repository.ICommentsService#addComments(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public boolean addComments(String filePath, String comments, int userID, int areaId) throws GAException {
+    public boolean addComments(String filePath, String comments, int userID, int areaId, int mainCommentId, char showNameFlag) throws GAException {
         LOGGER.info("Upload file called!!");
-        boolean result = commentsMapper.addComments(filePath, comments, userID, areaId);
+        boolean result = commentsMapper.addComments(filePath, comments, userID, areaId, mainCommentId, showNameFlag);
 
         if (result) {
             LOGGER.info("File uploaded successfully");
@@ -88,6 +88,9 @@ public class CommentsServiceImpl implements ICommentsService {
             return commentsDtoList;
         }
     }
+    
+    
+    
 
     /*
      * (non-Javadoc)
@@ -187,7 +190,7 @@ public class CommentsServiceImpl implements ICommentsService {
                 /* print substrings */
 
                 LOGGER.info("extension :" + sli[sli.length - 1]);
-                File newFile = new File("C:/Users/venkatabharat/git/bee/SSR/comments/" + f + "." + sli[sli.length - 1]);
+                File newFile = new File("C:/xampp/htdocs/Feedbacktool/images/" + f + "." + sli[sli.length - 1]);
 
                 BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(newFile));
                 LOGGER.info("newFile :" + newFile);
@@ -279,6 +282,27 @@ public class CommentsServiceImpl implements ICommentsService {
     }
     
     @Override
+    public List<CommentDTO> getAllSubComments(int mainCommentId,int userId, Integer userTime) throws GAException {
+    	LOGGER.info("Get all main comments list by area");
+        List<CommentDTO> commentsDtoList = new ArrayList<CommentDTO>();
+        List<CommentDTO> commentList = commentsMapper.getAllSubComments(mainCommentId,userId);
+        if(commentList.isEmpty()){
+        	throw new GAException(ErrorCodes.GA_INTERNAL);
+        }
+        
+       /* for (CommentHistory commentHistory : commentList){
+        	commentsDtoList.add(convertEntityToDTO(commentHistory, userTime));
+        }*/
+
+        if (commentList.isEmpty()) {
+            throw new GAException(ErrorCodes.GA_INTERNAL);
+        } else {
+            LOGGER.info("CommentsDtoList : " + commentsDtoList.toString());
+            return commentList;
+        }
+    }
+    
+    @Override
     public boolean commentLike(int commentId, String action){
     	
     	return commentsMapper.commentLike(commentId, action);
@@ -288,4 +312,39 @@ public class CommentsServiceImpl implements ICommentsService {
 	public boolean commentUnlike(int commentId, String action){
     	return commentsMapper.commentUnlike(commentId, action);
     }
+
+	@Override
+	public List<CommentDTO> getGlobalCommentsList(int userId, Integer userTime) throws GAException {
+		// TODO Auto-generated method stub
+		LOGGER.info("Get all main comments list by area");
+        List<CommentDTO> commentsDtoList = new ArrayList<CommentDTO>();
+        List<CommentDTO> commentList = commentsMapper.getGlobalComments(userId);
+        if(commentList.isEmpty()){
+        	throw new GAException(ErrorCodes.GA_INTERNAL);
+        }
+        
+       /* for (CommentHistory commentHistory : commentList){
+        	commentsDtoList.add(convertEntityToDTO(commentHistory, userTime));
+        }*/
+
+        if (commentList.isEmpty()) {
+            throw new GAException(ErrorCodes.GA_INTERNAL);
+        } else {
+            LOGGER.info("CommentsDtoList : " + commentsDtoList.toString());
+            return commentList;
+        }
+		
+		//return null;
+	}
+
+	/*@Override
+	public boolean addSubComments(String filePath, String comments, int userId,
+			int areaId, int mainCommentId) throws GAException {
+		// TODO Auto-generated method stub
+		LOGGER.info("Upload file called!!");
+        boolean result = commentsMapper.addSubComments(filePath, comments, userId, areaId, mainCommentId);
+
+        
+		return result;
+	}*/
 }

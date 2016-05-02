@@ -1,5 +1,8 @@
 package com.ga.repository;
 
+import java.sql.ResultSet;
+import java.util.List;
+
 import com.ga.domain.model.UserDTO;
 import com.ga.exception.GAException;
 
@@ -20,8 +23,10 @@ public interface IUserService {
      */
     UserDTO userLogin(String username, String password) throws GAException;
 
-    UserDTO newUserLogin(String username, String password, int areaId) throws GAException;
+    UserDTO newUserLogin(String username, String password, int areaId, String showName) throws GAException;
 
 	boolean userExists(String userName);
+
+	List<Object> getUserNames();
 
 }
